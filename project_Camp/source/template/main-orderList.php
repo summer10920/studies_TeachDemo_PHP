@@ -28,6 +28,11 @@ foreach ($rows as $row) {
     }
   }
 
+  $getAry = [
+    'do' => 'delOrder',
+    'id' => $row['id']
+  ];
+  //這裡可以string慢慢湊，或者利用http_build_query將array轉為get參數
 
   $htmlCode .= '<tr>
     <td>' . $row['name'] . '</td>
@@ -36,9 +41,11 @@ foreach ($rows as $row) {
     <td>' . $row['price'] . '</td>
     <td>' . $row['phone'] . ' | ' . $row['mail'] . '</td>
     <td>' . $row['createDate'] . '</td>
-    <td>' . $row['del'] . '</td>
-  </tr>';
+    <td><a class="btn btn-danger btn-sm" href="function.php?' . http_build_query($getAry) . '">刪除</a></td>
+    </tr>';
 }
+
+
 
 ?>
 
@@ -46,7 +53,7 @@ foreach ($rows as $row) {
   <h1 class="mt-4">訂購資料</h1>
   <div class="card mb-4">
     <div class="card-body">
-      <table id="datatablesSimple">
+      <table id="orderTable" class="table">
         <thead>
           <tr>
             <th>訂購人</th>

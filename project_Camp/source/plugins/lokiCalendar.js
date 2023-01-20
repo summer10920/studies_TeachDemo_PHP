@@ -101,7 +101,7 @@ const init = () => {
       else {
         // fetch post
         // fetch('https://jsonplaceholder.typicode.com/posts', {
-        fetch('/function.php?to=api&do=newOrder', {
+        fetch('/function.php?do=newOrder', {
           method: 'POST',
           body: sendData,
           // headers: { 'Content-Type': 'multipart/form-data' }

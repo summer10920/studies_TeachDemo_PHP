@@ -1,4 +1,4 @@
-onload = () => {
+window.addEventListener('DOMContentLoaded', event => {
   var grid = document.querySelector('#lokiPark article.row');
   new Masonry(grid, { percentPosition: 'true' });
 
@@ -34,4 +34,6 @@ onload = () => {
     }
   }
   else cookieNode.remove();
-}
+
+
+});

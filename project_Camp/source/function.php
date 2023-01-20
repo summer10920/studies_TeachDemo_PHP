@@ -16,7 +16,12 @@ class lokiSQL {
   }
 
   public function insert($tb, $sqlCode) {  //提供資料表名稱跟value陣列，能操作 SQL-INSERT
-    return $this->db->query('INSERT INTO ' . $tb . ' VALUES (' . implode(',', $sqlCode) . ')');
+    return $this->db->query('INSERT INTO ' . $this->prefix_name . $tb . ' VALUES (' . implode(',', $sqlCode) . ')');
+  }
+
+  public function update($tb, $set, $wh) {  //提供資料表名稱跟value陣列，能操作 SQL-INSERT
+    return $this->db->query('UPDATE ' . $this->prefix_name . $tb . ' SET ' . $set . ' WHERE ' . $wh);
+    // UPDATE _loki_order_list SET del=1 WHERE id=5
   }
 }
 
@@ -37,16 +42,22 @@ $sql = new lokiSQL();
 
 function getOrderList() {
   global $sql;
-  return $sql->select('orderList', 1);
+  return $sql->select('order_list', 'del=0');
 }
 
 function saveOrder($sqlCode) {
   global $sql;
-  $sql->insert('_loki_orderList', $sqlCode);
+  return $sql->insert('order_list', $sqlCode)->queryString; //如果SQL指令成功，可以捕獲到這個String
+}
+
+function delOrder($id) {
+  global $sql;
+  return $sql->update('order_list', 'del=1', 'id=' . $id)->queryString;
+  // UPDATE _loki_order_list SET del=1 WHERE id=5
 }
 
 // api todo
-if (isset($_GET['to'])) {
+if (isset($_GET['do'])) {
   switch ($_GET['do']) {
     case 'newOrder':
 
@@ -57,7 +68,7 @@ if (isset($_GET['to'])) {
       $selectDateZip = serialize(json_decode($_POST['selectDate']));
 
       // $selloutAry = json_decode($_POST['sellout'], true);
-      // $selloutIsset = array_filter($selloutAry, function ($v) {
+      // $selloutIsSet = array_filter($selloutAry, function ($v) {
       //   return $v !== 0;
       // });
       $selloutZip = serialize(array_filter(json_decode($_POST['sellout'], true), function ($v) {
@@ -68,11 +79,19 @@ if (isset($_GET['to'])) {
       //最後提交到sql時需要string符號，因此這裡需要追加並利用跳脫字元。
       // print_r($sqlCode);
 
-      saveOrder($sqlCode);
+      // saveOrder($sqlCode);
+      if (saveOrder($sqlCode)) {
+        header("Content-Type: application/json");
+        echo json_encode(['STATE' => 'DONE']); //最後要回應給前端一個json被捕獲。
+        exit();
+      } else echo 'SQL FAIL';
+      break;
 
-      header("Content-Type: application/json");
-      echo json_encode(['STATE' => 'DONE']); //最後要回應給前端一個json被捕獲。
-      exit();
+    case 'delOrder':
+      if (delOrder($_GET['id'])) {
+        header('Location:admin.php');
+        exit();
+      } else echo 'SQL FAIL';
       break;
 
     default:

@@ -8,7 +8,9 @@
   <meta name="description" content="洛奇度假村 - 後台" />
   <meta name="author" content="Loki Jiang" />
   <title>洛奇度假村 - 後台</title>
-  <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/jq-3.6.0/dt-1.13.1/datatables.min.css" />
+  <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/jq-3.6.0/dt-1.13.1/datatables.min.js"></script>
+
   <link href="/plugins/admin-styles.css" rel="stylesheet" />
   <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
 </head>
@@ -84,7 +86,7 @@
           <h1 class="mt-4">訂購資料</h1>
           <div class="card mb-4">
             <div class="card-body">
-              <table id="datatablesSimple">
+              <table id="orderTable" class="table">
                 <thead>
                   <tr>
                     <th>訂購人</th>
@@ -163,8 +165,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
     crossorigin="anonymous"></script>
   <script src="/plugins/admin-scripts.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
-  <script src="/plugins/datatables-simple-demo.js"></script>
 </body>
 
 </html>
