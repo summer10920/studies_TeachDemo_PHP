@@ -45,13 +45,13 @@
         <div class="sb-sidenav-menu">
           <div class="nav">
             <div class="sb-sidenav-menu-heading">訂房資訊</div>
-            <a class="nav-link" href="#!">
+            <a class="nav-link" href="admin.php">
               <i class="sb-nav-link-icon fas fa-tachometer-alt"></i>訂單資料</a>
             <a class="nav-link" href="#!">
               <i class="sb-nav-link-icon fas fa-tachometer-alt"></i>每日房況</a>
             <a class="nav-link" href="#!">
               <i class="sb-nav-link-icon fas fa-tachometer-alt"></i>國定假日</a>
-            <a class="nav-link" href="#!">
+            <a class="nav-link" href="pallet.php">
               <i class="sb-nav-link-icon fas fa-tachometer-alt"></i>營位參數設定</a>
             <!-- /////////////////// -->
             <div class="sb-sidenav-menu-heading">Addons</div>

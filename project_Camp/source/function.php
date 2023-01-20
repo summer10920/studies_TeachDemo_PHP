@@ -56,6 +56,16 @@ function delOrder($id) {
   // UPDATE _loki_order_list SET del=1 WHERE id=5
 }
 
+function getPallet() {
+  global $sql;
+  return $sql->select('pallet', 1);
+}
+
+function updatePallet($id, $set) {
+  global $sql;
+  return $sql->update('pallet', $set, 'id=' . $id)->queryString;
+}
+
 // api todo
 if (isset($_GET['do'])) {
   switch ($_GET['do']) {
@@ -94,6 +104,26 @@ if (isset($_GET['do'])) {
       } else echo 'SQL FAIL';
       break;
 
+    case 'mdyPallet':
+      // print_r($_POST);
+      $flag = true;
+      foreach ($_POST['id'] as $key => $value) {
+        // "UPDATE _loki_pallet SET id=[value-1],name=[value-2],total=[value-3],normalPrice=[value-4],holidayPrice=[value-5] WHERE 1";
+        $setAry = [
+          'total=' . $_POST['total'][$key],
+          'normalPrice=' . $_POST['normalPrice'][$key],
+          'holidayPrice=' . $_POST['holidayPrice'][$key]
+        ];
+
+        $setStr = implode(', ', $setAry);
+        if (!updatePallet($value, $setStr)) $flag = false;
+      }
+
+      if ($flag) {
+        header('Location:pallet.php');
+        exit();
+      }
+      break;
     default:
       break;
   }

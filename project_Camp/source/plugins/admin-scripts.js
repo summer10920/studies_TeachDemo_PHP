@@ -25,7 +25,6 @@ window.addEventListener('DOMContentLoaded', event => {
 
     // Simple-DataTables
     const orderTable = document.getElementById('orderTable');
-    console.log(orderTable);
     if (orderTable) new DataTable(orderTable);
 
 });
