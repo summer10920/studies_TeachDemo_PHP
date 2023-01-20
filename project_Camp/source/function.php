@@ -23,6 +23,11 @@ class lokiSQL {
     return $this->db->query('UPDATE ' . $this->prefix_name . $tb . ' SET ' . $set . ' WHERE ' . $wh);
     // UPDATE _loki_order_list SET del=1 WHERE id=5
   }
+
+  public function query($sqlCode) {  //提供資料表名稱跟value陣列，能操作 SQL-INSERT
+    return $this->db->query($sqlCode);
+    // UPDATE _loki_order_list SET del=1 WHERE id=5
+  }
 }
 
 ///////////// custom function
@@ -64,6 +69,18 @@ function getPallet() {
 function updatePallet($id, $set) {
   global $sql;
   return $sql->update('pallet', $set, 'id=' . $id)->queryString;
+}
+
+function getHoliday() {
+  global $sql;
+
+  // INSERT INTO _loki_holiday (year) SELECT YEAR(CURRENT_DATE())+3 WHERE NOT EXISTS (SELECT * FROM _loki_holiday WHERE year=YEAR(CURRENT_DATE())+3)
+  for ($i = 0; $i < 3; $i++) {
+    $checkYear = 'INSERT INTO _loki_holiday (year) SELECT YEAR(CURRENT_DATE())+' . $i . ' WHERE NOT EXISTS (SELECT * FROM _loki_holiday WHERE year=YEAR(CURRENT_DATE())+' . $i . ')';
+    $sql->query($checkYear);
+  }
+
+  return $sql->select('holiday', 'year>=YEAR(CURRENT_DATE()) ORDER BY year');
 }
 
 // api todo
