@@ -6,7 +6,7 @@ dayjs.extend(dayjs_plugin_isBetween); //宣告
 
 //全域變數宣告區
 let
-  fetchPath = 'db.json',
+  fetchPath = 'db.json.php',
   nationalHoliday = [],
   booked = [],
   pallet = {},
