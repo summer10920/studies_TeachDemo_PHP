@@ -9,7 +9,8 @@ foreach ($rows as $row) {
       <div class="card-header">' . $row['year'] . '</div>
       <div class="card-body">
         <div class="form-floating">
-          <textarea style="min-height:30rem" class="form-control">'.$row['date'].'</textarea>
+          <input type="hidden" name="id[]" value="' . $row['id'] . '">
+          <textarea name="date[]" style="min-height:30rem" class="form-control">' . $row['date'] . '</textarea>
           <label for="floatingTextarea">特殊假日</label>
         </div>
       </div>
@@ -19,7 +20,7 @@ foreach ($rows as $row) {
 }
 
 ?>
-<form class="container-fluid px-4">
+<form class="container-fluid px-4" method="post" action="function.php?do=mdyHoliday">
   <h1 class="mt-4">國定假日</h1>
   <div class="row row-cols-1 row-cols-sm-3">
     <?= $htmlCode ?>

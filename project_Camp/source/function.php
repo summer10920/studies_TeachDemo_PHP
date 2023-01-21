@@ -20,6 +20,7 @@ class lokiSQL {
   }
 
   public function update($tb, $set, $wh) {  //提供資料表名稱跟value陣列，能操作 SQL-INSERT
+    // echo 'UPDATE ' . $this->prefix_name . $tb . ' SET ' . $set . ' WHERE ' . $wh;
     return $this->db->query('UPDATE ' . $this->prefix_name . $tb . ' SET ' . $set . ' WHERE ' . $wh);
     // UPDATE _loki_order_list SET del=1 WHERE id=5
   }
@@ -79,9 +80,14 @@ function getHoliday() {
     $checkYear = 'INSERT INTO _loki_holiday (year) SELECT YEAR(CURRENT_DATE())+' . $i . ' WHERE NOT EXISTS (SELECT * FROM _loki_holiday WHERE year=YEAR(CURRENT_DATE())+' . $i . ')';
     $sql->query($checkYear);
   }
-
   return $sql->select('holiday', 'year>=YEAR(CURRENT_DATE()) ORDER BY year');
 }
+
+function updateHoliday($id, $set) {
+  global $sql;
+  return $sql->update('holiday', $set, 'id=' . $id)->queryString;
+}
+
 
 // api todo
 if (isset($_GET['do'])) {
@@ -138,6 +144,19 @@ if (isset($_GET['do'])) {
 
       if ($flag) {
         header('Location:pallet.php');
+        exit();
+      }
+      break;
+    case 'mdyHoliday':
+      // print_r($_POST);
+      $flag = true;
+      foreach ($_POST['id'] as $key => $value) {
+        $setStr = 'date=\'' . $_POST['date'][$key] . '\'';
+        if (!updateHoliday($value, $setStr)) $flag = false;
+      }
+
+      if ($flag) {
+        header('Location:holiday.php');
         exit();
       }
       break;
