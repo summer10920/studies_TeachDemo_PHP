@@ -96,7 +96,7 @@ $dbJSONStr = '{
 }';
 
 
-// pallet start
+// pallet data
 $rows = getPallet(); //取得
 $pallet = []; //初始
 foreach ($rows as $row) {
@@ -108,8 +108,22 @@ foreach ($rows as $row) {
 }
 $pallet += ['count' => array_sum(array_column($rows, 'total'))]; //計算count的value
 
-$dbJSONAry = json_decode($dbJSONStr, true); 
-$dbJSONAry['pallet'] = $pallet; //更新指定的值
+// holiday data
+$rows = getHoliday(); //取得
+$nationalHoliday = [];
+foreach ($rows as $row) $nationalHoliday = array_merge($nationalHoliday, explode("\r\n", $row['date']));
+/* PHP 中的單引號表示“不解析此字符串”。它們被視為文字（不是換行符和回車符，而是實際的文字“\n\r”）。
+* 使用雙引號意味著“解析這個字符串”，因此您的控製字符將被解析。
+*/
 
+//overwrite to json
+$dbJSONAry = json_decode($dbJSONStr, true);
+
+//each data overwrite
+$dbJSONAry['pallet'] = $pallet; //更新指定的值
+$dbJSONAry['nationalHoliday'] = $nationalHoliday; //更新指定的值
+
+
+//show on page
 header("Content-Type: application/json"); //將網頁的內容型別切成json，讓瀏覽器知道這是json不是string
 echo json_encode($dbJSONAry); //將php的經修改的array以json(string)方式顯示。
