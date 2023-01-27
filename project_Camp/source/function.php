@@ -89,6 +89,8 @@ function updateHoliday($id, $set) {
 }
 
 
+
+
 // api todo
 if (isset($_GET['do'])) {
   switch ($_GET['do']) {
@@ -97,22 +99,56 @@ if (isset($_GET['do'])) {
       // var_dump($_POST['sellout']);//注意這裡是字串 string(41) "{"aArea":2,"bArea":0,"cArea":0,"dArea":0}"
       // var_dump($_POST['selectDate']);//這裡也是字串
 
-      // $selectDateAry = json_decode($_POST['selectDate']);
-      $selectDateZip = serialize(json_decode($_POST['selectDate']));
+      $selectDateAry = json_decode($_POST['selectDate']);
+      $selectDateZip = serialize($selectDateAry);
 
-      // $selloutAry = json_decode($_POST['sellout'], true);
-      // $selloutIsSet = array_filter($selloutAry, function ($v) {
-      //   return $v !== 0;
-      // });
-      $selloutZip = serialize(array_filter(json_decode($_POST['sellout'], true), function ($v) {
+      $selloutAry = array_filter(json_decode($_POST['sellout'], true), function ($v) {
         return $v !== 0;
-      }));
+      });
+      $selloutZip = serialize($selloutAry);
 
-      $sqlCode = ['null', '\'' . $_POST['userName'] . '\'', '\'' . $_POST['userPhone'] . '\'', '\'' . $_POST['userMail'] . '\'', '\'' . $selectDateZip . '\'', '\'' . $selloutZip . '\'', 'NOW()', 999, 0];
-      //最後提交到sql時需要string符號，因此這裡需要追加並利用跳脫字元。
-      // print_r($sqlCode);
+      //計算價格
+      /*
+      Array
+      (
+          [userName] => 213
+          [userPhone] => 123123
+          [userMail] => 123123@123
+          [selectDate] => ["2023-02-21"]
+          [sellout] => {"aArea":2,"bArea":0,"cArea":0,"dArea":0}
+      )
+      */
+      $sum = 0;
+      $palletAry = [];
+      // $rows = getPallet();
+      foreach (getPallet() as $row) {
+        $palletAry[$row['name']]['normalPrice'] = $row['normalPrice'];
+        $palletAry[$row['name']]['holidayPrice'] = $row['holidayPrice'];
+      }
+      // print_r($palletAry);
 
-      // saveOrder($sqlCode);
+      // $rows = getHoliday();
+      $holidayAry = [];
+      foreach (getHoliday() as $row) {
+        $holidayAry = array_merge($holidayAry, explode("\r\n", $row['date']));
+      }
+
+      foreach ($selectDateAry as $value) {
+        $day = date("D", strtotime($value));
+
+        // if ($day == 'Sat' || $day == 'Sun' || in_array($value, $holidayAry)) {
+        //   //is holiday!!
+        // } else {
+        //   //is normal day!!
+        // }
+        $keyword = $day == 'Sat' || $day == 'Sun' || in_array($value, $holidayAry) ? 'holidayPrice' : 'normalPrice';
+
+        foreach ($selloutAry as $key => $value) {
+          $sum += $palletAry[$key][$keyword] * $value;
+        }
+      }
+
+      $sqlCode = ['null', '\'' . $_POST['userName'] . '\'', '\'' . $_POST['userPhone'] . '\'', '\'' . $_POST['userMail'] . '\'', '\'' . $selectDateZip . '\'', '\'' . $selloutZip . '\'', 'NOW()', $sum, 0];
       if (saveOrder($sqlCode)) {
         header("Content-Type: application/json");
         echo json_encode(['STATE' => 'DONE']); //最後要回應給前端一個json被捕獲。
