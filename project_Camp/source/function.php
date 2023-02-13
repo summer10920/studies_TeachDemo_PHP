@@ -57,7 +57,22 @@ function saveOrder($sqlCode) {
 }
 
 function delOrder($id) {
+  // print_r($_GET);
   global $sql;
+
+  foreach ($_GET['date'] as $date) {
+    // UPDATE _loki_daily_state SET aArea = aArea + 1, bArea=bArea+2, cArea=cArea+3 WHERE date = '2023-02-01'
+    $areaUpdate = implode(', ', array_map(
+      function ($value, $key) {
+        return '' . $key . ' = ' . $key . ' - ' . $value; //aArea = aArea + 1
+      },
+      $_GET['pallet'],
+      array_keys($_GET['pallet'])
+    ));
+    // echo 'UPDATE _loki_daily_state SET ' . $areaUpdate . ' WHERE date = "' . $date . '"';
+    $sql->query('UPDATE _loki_daily_state SET ' . $areaUpdate . ' WHERE date = "' . $date . '"');
+  }
+
   return $sql->update('order_list', 'del=1', 'id=' . $id)->queryString;
   // UPDATE _loki_order_list SET del=1 WHERE id=5
 }
@@ -178,7 +193,7 @@ if (isset($_GET['do'])) {
         // 3. 翻新 _loki_daily_state 用，組合出 SET 代碼
         // UPDATE _loki_daily_state SET aArea = aArea + 1, bArea=bArea+2, cArea=cArea+3 WHERE date = '2023-02-01'
         $areaUpdate = implode(', ', array_map(
-          function ($value, $key) use ($palletAry) {
+          function ($value, $key) {
             return '' . $key . ' = ' . $key . ' + ' . $value; //aArea = aArea + 1
           },
           $selloutAry,

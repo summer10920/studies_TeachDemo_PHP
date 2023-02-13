@@ -30,9 +30,19 @@ foreach ($rows as $row) {
 
   $getAry = [
     'do' => 'delOrder',
-    'id' => $row['id']
+    'id' => $row['id'],
+    'date' => $selectDateAry, //增加
+    'pallet' => $selectPalletObj //增加
   ];
   //這裡可以string慢慢湊，或者利用http_build_query將array轉為get參數
+
+  $dateNum = array_map(function ($date) {
+    return strtotime($date);
+  }, $selectDateAry);
+
+  $lessDay = min($dateNum) < time() ?
+    '<span class="btn btn-secondary btn-sm disabled">過期</span>' :
+    '<a class="btn btn-danger btn-sm" href="function.php?' . http_build_query($getAry) . '">刪除</a>';
 
   $htmlCode .= '<tr>
     <td>' . $row['name'] . '</td>
@@ -41,7 +51,7 @@ foreach ($rows as $row) {
     <td>' . $row['price'] . '</td>
     <td>' . $row['phone'] . ' | ' . $row['mail'] . '</td>
     <td>' . $row['createDate'] . '</td>
-    <td><a class="btn btn-danger btn-sm" href="function.php?' . http_build_query($getAry) . '">刪除</a></td>
+    <td>' . $lessDay . '</td>
     </tr>';
 }
 
