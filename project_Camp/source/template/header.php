@@ -1,4 +1,7 @@
-<?php require_once("./function.php"); ?>
+<?php
+require_once("./function.php");
+if (empty($_SESSION['admin'])) header('Location:/');
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -34,7 +37,7 @@
           <li>
             <hr class="dropdown-divider" />
           </li>
-          <li><a class="dropdown-item" href="#!">登出</a></li>
+          <li><a class="dropdown-item" href="function.php?do=logout">登出</a></li>
         </ul>
       </li>
     </ul>

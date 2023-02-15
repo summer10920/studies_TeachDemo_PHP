@@ -1,7 +1,7 @@
 <?php
 session_save_path('tmp');
 session_start();
-
+// echo $_SERVER['REQUEST_URI'];
 class lokiSQL {
   private
     $db,
@@ -34,17 +34,14 @@ class lokiSQL {
 ///////////// custom function
 $sql = new lokiSQL();
 
-// function checkUserSaveSession($acc, $pwd) {
-//   global $sql;
-//   if (isset($_SESSION['admin'])) return true; //如果存在就直接回傳ture，不用再驗證設定SESSION
+function checkUserSaveSession($acc, $pwd) {
+  global $sql;
+  if (isset($_SESSION['admin'])) return true; //如果存在就直接回傳true，不用再驗證設定SESSION
 
-//   $check = !!$sql->select('user', 'name="' . $acc . '" AND password="' . $pwd . '" AND active=1');
-//   if ($check) $_SESSION['admin'] = $acc;
-//   return $check;
-// }
-
-// var_dump(checkUserSaveSession('admin', '1234'));
-
+  $check = !!$sql->select('user', 'name="' . $acc . '" AND password="' . $pwd . '" AND active=1');
+  if ($check) $_SESSION['admin'] = $acc;
+  return $check;
+}
 
 function getOrderList() {
   global $sql;
@@ -261,6 +258,17 @@ if (isset($_GET['do'])) {
         header('Location:holiday.php');
         exit();
       }
+      break;
+
+    case 'login':
+      // var_dump($_GET, $_POST);
+      if (checkUserSaveSession($_POST['inputAccount'], $_POST['inputPassword']))
+        header('Location:admin.php');
+      else exit('access deny');
+      break;
+    case 'logout':
+      unset($_SESSION['admin']);
+      header('Location:/');
       break;
     default:
       break;
