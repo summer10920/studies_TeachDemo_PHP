@@ -36,10 +36,17 @@ $sql = new lokiSQL();
 
 function checkUserSaveSession($acc, $pwd) {
   global $sql;
-  if (isset($_SESSION['admin'])) return true; //如果存在就直接回傳true，不用再驗證設定SESSION
-
+  // if (isset($_SESSION['admin'])) return true; //如果存在就直接回傳true，不用再驗證設定SESSION
   $check = !!$sql->select('user', 'name="' . $acc . '" AND password="' . $pwd . '" AND active=1');
-  if ($check) $_SESSION['admin'] = $acc;
+
+  if ($check) {
+    date_default_timezone_set('Asia/Taipei');
+    $token = md5($acc . $pwd . strtotime('now'));
+    $result = $sql->update('user', 'token="' . $token . '", expire=DATE_ADD(NOW(), INTERVAL 5 MINUTE)', 'name="' . $acc . '"')->queryString;
+    if ($result) $_SESSION['admin'] = $token;
+    else exit('sql fail');
+  }
+
   return $check;
 }
 
@@ -136,6 +143,33 @@ function checkHoliday($date) {
   return $day == 'Sat' || $day == 'SUN' || in_array($date, $holidayAry) ? true : false;
 }
 
+function checkPermission() {
+  global $sql;
+  $life = $sql->select('user', 'expire<NOW() and name="admin"'); //是否有時間已過期
+
+  if (count($life)) { //有找到代表有過期
+    unset($_SESSION['admin']);
+    exit("
+      <script>
+        alert('連線逾時，請重新作業。');
+        document.location.href = '/login.php';
+      </script>
+    ");
+  }
+
+  $tokenIsset = $sql->select('user', 'token="' . $_SESSION['admin'] . '"');
+  if (count($tokenIsset))  //token不變，延長壽命
+    $sql->update('user', 'expire=DATE_ADD(NOW(), INTERVAL 5 MINUTE)', 'name="' . $tokenIsset[0]['name'] . '"')->queryString;
+  else { //token 已改變，清除session，顯示重複登入，登出，踢回login
+    unset($_SESSION['admin']);
+    exit("
+      <script>
+        alert('帳號重複登入，請重新作業。');
+        document.location.href = '/login.php';
+      </script>
+    ");
+  }
+}
 
 // api todo
 if (isset($_GET['do'])) {
@@ -246,6 +280,7 @@ if (isset($_GET['do'])) {
         exit();
       }
       break;
+
     case 'mdyHoliday':
       // print_r($_POST);
       $flag = true;
@@ -261,11 +296,11 @@ if (isset($_GET['do'])) {
       break;
 
     case 'login':
-      // var_dump($_GET, $_POST);
       if (checkUserSaveSession($_POST['inputAccount'], $_POST['inputPassword']))
         header('Location:admin.php');
       else exit('access deny');
       break;
+
     case 'logout':
       unset($_SESSION['admin']);
       header('Location:/');

@@ -1,6 +1,7 @@
 <?php
 require_once("./function.php");
 if (empty($_SESSION['admin'])) header('Location:/');
+checkPermission();
 ?>
 
 <!DOCTYPE html>
